@@ -1,6 +1,7 @@
 (ns tic-tac-toe.model-test
   (:require [tic-tac-toe.model :as t]
             [clojure.spec.alpha :as s]
+            [tic-tac-toe.result :as r]
             [clojure.test :refer [is are deftest testing]]))
 
 (deftest initial-state
@@ -10,8 +11,9 @@
 
 (deftest clicking
   (let [s0 t/initial-state
-        s1 (t/click s0 [0 0])
-        s2 (t/click s1 [0 1])]
+        s1 (r/value (t/click s0 [0 0]))
+        r1 (t/click s0 [0 0])
+        s2 (r/value (t/click s1 [0 1]))]
     (is (s/valid? ::t/game s1))
     (is (s/valid? ::t/game s2))
     (is (= :o (:turn s1)))
@@ -20,7 +22,9 @@
     (is (= :x (get-in [:board 0 0] s1)))
     (is (= [[:x :o nil]
             [nil nil nil]
-            [nil nil nil]] (:board s2)))))
+            [nil nil nil]] (:board s2)))
+    (is (r/faliure? r1))
+    (is (= (r/error r1) :duplicate-mark))))
 
 (deftest victor-test
   (let [none {:board
@@ -46,4 +50,8 @@
     (is (= nil (t/victor none)))
     (is (= :o (t/victor o-vert)))
     (is (= :x (t/victor x-hori)))
-    (is (= :x (t/victor x-cross)))))
+    (is (= :x (t/victor x-cross)))
+    (testing "victory prevents further moves"
+      (let [r (t/click x-cross [2 0])]
+        (is (r/faliure? r))
+        (is (= :game-ended (r/error r)))))))
