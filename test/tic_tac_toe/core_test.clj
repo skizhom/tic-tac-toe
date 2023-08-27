@@ -1,7 +1,18 @@
 (ns tic-tac-toe.core-test
   (:require [clojure.test :refer :all]
-            [tic-tac-toe.core :refer :all]))
+            [tic-tac-toe.core :as t]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest printing-test
+  (let [expected-output
+        (str "o|o| \n"
+             "-+-+-\n"
+             "x|x| \n"
+             "-+-+-\n"
+             " | | \n")
+        data {:board
+              [[:o :o nil]
+               [:x :x nil]
+               [nil nil nil]
+               :turn :o]}]
+    (is (= expected-output
+           (with-out-str (t/print-board data))))))
