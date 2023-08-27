@@ -9,3 +9,7 @@
 (s/def ::game (s/keys :req-un [::board ::turn]))
 
 (def initial-state {})
+
+(defn click [state position])
+
+(defn victor [state])
