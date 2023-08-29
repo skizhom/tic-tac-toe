@@ -30,7 +30,7 @@
 (defn transpose [x]
   (apply mapv vector x))
 
-(def reversev vec)
+(def reversev (comp vec reverse))
 
 (def rotate90deg "shape->shape"
   (comp transpose reversev))
