@@ -27,26 +27,23 @@
     (is (= (r/error r1) :duplicate-mark))))
 
 (deftest victor-test
-  (let [none {:board
-              [[nil nil nil]
-               [nil :x :o]
-               [nil nil nil]
-               :turn :x]}
-        o-vert {:board
-                [[nil :x :o]
-                 [nil :x :o]
-                 [:x nil :o]
-                 :turn :x]}
-        x-hori {:board
-                [[nil :x :o]
-                 [nil :x :o]
-                 [nil :x nil]
-                 :turn :o]}
-        x-cross {:board
-                 [[:x nil :o]
-                  [nil :x :o]
-                  [nil nil :x]
-                  :turn :o]}]
+  (let [create #(assoc initial-state :board %2 :turn %1)
+        none (create :x
+                     [[nil nil nil]
+                      [nil :x :o]
+                      [nil nil nil]])
+        o-vert (create :x
+                       [[nil :x :o]
+                        [nil :x :o]
+                        [:x nil :o]])
+        x-hori (create :o
+                       [[nil :x :o]
+                        [nil :x :o]
+                        [nil :x nil]])
+        x-cross (create :o
+                        [[:x nil :o]
+                         [nil :x :o]
+                         [nil nil :x]])]
     (is (= nil (t/victor none)))
     (is (= :o (t/victor o-vert)))
     (is (= :x (t/victor x-hori)))
@@ -55,3 +52,31 @@
       (let [r (t/click x-cross [2 0])]
         (is (r/faliure? r))
         (is (= :game-ended (r/error r)))))))
+
+(deftest testing-helpers
+  (testing "rotation"
+    (is (= [[4 1]
+            [3 2]]
+           (t/rotate90deg [[1 2]
+                           [4 3]]))))
+  (testing "rotations"
+    (is (= #{[[1 2]]
+             [[2 1]]
+             [[1] [2]]
+             [[2] [1]]}
+           (set (t/rotations [[1 2]])))))
+  (testing "positions"
+    (is (= #{#{[0 0] [0 1]}
+             #{[1 0] [1 1]}}
+           (set (t/positions [[true true]] [2 2]))))
+    (is (= #{#{[0 0]}
+             #{[1 0]}}
+           (set (t/positions [[true false]] [2 2]))))
+    (is (= #{#{[0 0]}
+             #{[1 0]}
+             #{[0 1]}
+             #{[1 1]}}
+           (set (t/positions [[true]] [2 2]))))
+    (is (= #{#{[0 0]}
+             #{[0 1]}}
+           (set (t/positions [[true]] [1 2]))))))
