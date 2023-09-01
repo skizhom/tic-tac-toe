@@ -12,4 +12,31 @@
 
 (defn click [state position])
 
-(defn victor [state])
+(defn col-wise
+      [matrix]
+      (apply map vector matrix))
+
+(defn diagonaler
+      [matrix]
+      (map nth matrix [0 1 2]))
+
+(defn diagaonaler-inv
+      [matrix]
+      (map nth (reverse matrix) [0 1 2]))
+
+(defn matrix-permutations
+      [matrix]
+      (apply conj ((juxt col-wise first second last diagonaler diagaonaler-inv) matrix)))
+
+(defn continue?
+      [matrix]
+      (if (some nil? (vec (flatten matrix))) :continue "draw"))
+
+(defn matrix-check
+      [matrix]
+      (let [setted-coll (set (matrix-permutations matrix))
+            result        (clojure.set/intersection #{[:x :x :x] [:o :o :o]} setted-coll)]
+               (cond
+                 (= result #{[:x :x :x]}) "x won"
+                 (= result #{[:o :o :o]}) "o won"
+                 :else                    (continue? matrix))))
