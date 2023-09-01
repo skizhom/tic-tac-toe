@@ -18,30 +18,31 @@
            [:a3 :b3 :c3 :c1 :c2 :c3 :c3 :c1]))
 
 (defn game-result
-  [matrix]
-  (let [pattern-set (set (pattern-list matrix))
-        continue?   (contains? (set (map val matrix)) nil)]
-    (cond
-      (contains? pattern-set [:x :x :x]) :x-won
-      (contains? pattern-set [:o :o :o]) :o-won
-      (not continue?)                    :is-draw
-      :default                              :else)))
+      [matrix]
+      (let [pattern-set (set (pattern-list matrix))
+            continue?   (contains? (set (map val matrix)) nil)]
+        (cond
+          (contains? pattern-set [:x :x :x]) :x-won
+          (contains? pattern-set [:o :o :o]) :o-won
+          (not continue?)                    :is-draw
+          :default                              :else)))
+
 
 
 (def next-xox {:x :o, :o :x})
 
 (defn main [matrix turn]
-  (let [pos-string     (read-line)
-        pos-keyw       (keyword pos-string)
-        updated-matrix (update matrix pos-keyw turn)
-        game-state     (game-result updated-matrix)
-        turn-name      (name turn)
-        next-turn      (next-xox turn)]
-    (print (str "Player " turn-name "'s turn.\n"))
-    (print "Enter the position : ")
-    (flush)
-    (condp = game-state
-      :x-won    "player x won"
-      :o-won    "player o won"
-      :is-draw  "game ended in draw"
-      :else     (main updated-matrix next-turn))))
+      (let [pos-string     (read-line)
+            pos-keyw       (keyword pos-string)
+            updated-matrix (update matrix pos-keyw turn)
+            game-state     (game-result updated-matrix)
+            turn-name      (name turn)
+            next-turn      (next-xox turn)]
+        (print (str "Player " turn-name "'s turn.\n"))
+        (print "Enter the position : ")
+        (flush)
+        (condp = game-state
+          :x-won    "player x won"
+          :o-won    "player o won"
+          :is-draw  "game ended in draw"
+          :else     (main updated-matrix next-turn))))
