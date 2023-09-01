@@ -1,94 +1,47 @@
 (ns tic-tac-toe.model
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s])
+  (:require [clojure.core]))
 
-(s/def ::field #{:o :x nil})
-(s/def ::board (-> ::field
-                   (s/coll-of :kind vector? :count 3)
-                   (s/coll-of :kind vector? :count 3)))
-(s/def ::turn #{:o :x})
-(s/def ::rule (-> boolean?
-                  (s/coll-of :kind vector?)
-                  (s/coll-of :kind vector?)))
-(s/def ::rules (-> ::rule
-                   (s/coll-of :kind vector?)))
-(s/def ::game (s/keys :req-un [::board ::turn ::rules]))
+(def matrix {:a1 nil, :a2 nil, :a3 nil,
+             :b1 nil, :b2 nil, :b3 nil,
+             :c1 nil, :c2 nil, :c3 nil})
 
-(def default-rules [;; straight
-                    [[true true true]]
-                    ;; diagonal
-                    [[true false false]
-                     [false true false]
-                     [false false true]]])
+(defn check-patterns
+      [matrix pos1 pos2 pos3]
+      [(matrix pos1) (matrix pos2) (matrix pos3)])
 
-(def initial-state {})
-
-(defn click [state position])
-
-<<<<<<< HEAD
-
-(defn col-wise
+(defn pattern-list
       [matrix]
-      (apply map vector matrix))
+      (map (partial check-patterns matrix)
+           [:a1 :b1 :c1 :a1 :a2 :a3 :a1 :a3]
+           [:a2 :b2 :c2 :b1 :b2 :b3 :b2 :b2]
+           [:a3 :b3 :c3 :c1 :c2 :c3 :c3 :c1]))
 
-(defn diagonaler
-      [matrix]
-      (map nth matrix [0 1 2]))
+(defn game-result
+  [matrix]
+  (let [pattern-set (set (pattern-list matrix))
+        continue?   (contains? (set (map val matrix)) nil)]
+    (cond
+      (contains? pattern-set [:x :x :x]) :x-won
+      (contains? pattern-set [:o :o :o]) :o-won
+      (not continue?)                    :is-draw
+      :default                              :else)))
 
-(defn diagaonaler-inv
-      [matrix]
-      (map nth (reverse matrix) [0 1 2]))
 
-(defn matrix-permutations
-      [matrix]
-      (apply conj ((juxt col-wise first second last diagonaler diagaonaler-inv) matrix)))
+(def next-xox {:x :o, :o :x})
 
-(defn continue?
-      [matrix]
-      (if (some nil? (vec (flatten matrix))) :continue "draw"))
-
-(defn matrix-check
-      [matrix]
-      (let [setted-coll (set (matrix-permutations matrix))
-            result        (clojure.set/intersection #{[:x :x :x] [:o :o :o]} setted-coll)]
-               (cond
-                 (= result #{[:x :x :x]}) "x won"
-                 (= result #{[:o :o :o]}) "o won"
-                 :else                    (continue? matrix))))
-
-=======
-
-;(defn size [coll]
-;  [(count coll) (count (first coll))])
-;
-;(defn transpose [x]
-;  (apply mapv vector x))
-;
-;(def reversev (comp vec reverse))
-;
-;(def rotate90deg "shape->shape"
-;  (comp transpose reversev))
-;
-;(defn rotations "shape->shape"
-;  [x]
-;  (->> x
-;       (iterate rotate90deg)
-;       (take 4)))
-;
-;(defn positions "returns a list of sets of points which the rule covers"
-;  ;; keeping "shape" after this would be more and more cumbersome
-;  [shape area]
-;  (let [[a-x a-y] area
-;        [s-x s-y] (size shape)
-;        diff-x (- a-x s-x)
-;        diff-y (- a-y s-y)]
-;    (for [ox (range (inc diff-x))
-;          oy (range (inc diff-y))]
-;      ;; this can be done first (TODO)
-;      (->> (for [x (range s-x)
-;                 y (range s-y)
-;                 :when (get-in shape [x y])]
-;             [(+ ox x) (+ oy y)])
-;           (into #{})))))
-;
-;(defn victor [state])
-;>>>>>>> 271bdbd36d7cb4bd908493397422cbde5671da8e
+(defn main [matrix turn]
+  (let [pos-string     (read-line)
+        pos-keyw       (keyword pos-string)
+        updated-matrix (update matrix pos-keyw turn)
+        game-state     (game-result updated-matrix)
+        turn-name      (name turn)
+        next-turn      (next-xox turn)]
+    (print (str "Player " turn-name "'s turn.\n"))
+    (print "Enter the position : ")
+    (flush)
+    (condp = game-state
+      :x-won    "player x won"
+      :o-won    "player o won"
+      :is-draw  "game ended in draw"
+      :else     (main updated-matrix next-turn))))
