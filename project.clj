@@ -19,7 +19,7 @@
                  [org.slf4j/jul-to-slf4j "1.7.35"]
                  [org.slf4j/jcl-over-slf4j "1.7.35"]
                  [org.slf4j/log4j-over-slf4j "1.7.35"]
-                 [prismatic/schema "1.4.1"]
+                 [metosin/malli "0.12.0"]
                  [better-cond "2.1.5"]]
   :min-lein-version "2.0.0"
   :resource-paths ["config", "resources"]

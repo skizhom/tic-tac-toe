@@ -5,8 +5,9 @@
             [io.pedestal.http.params :as params]
             [better-cond.core :as b]
             ;; [io.pedestal.interceptor.helpers :as interceptor]
-            [schema.core :as s]
-            [schema.coerce :as coerce]
+            [malli.core :as m]
+            [malli.transform :as mt]
+            [malli.error :as me]
             ;; [io.pedestal.http.ring-middlewares :as middleware]
             [ring.util.response :as ring-resp]))
 
@@ -18,14 +19,19 @@
   (ring-resp/response (pr-str request)))
 
 (defn verify-body [schema]
-  (let [coercer (coerce/coercer schema coerce/json-coercion-matcher)
-        path [:request :body-params]]
-    {:enter (fn [context]
-              (let [body (get-in context path)
-                    coerced (coercer body)]
-                (if (isa? (type coerced)  schema.utils.ErrorContainer)
-                  (assoc context :response (ring-resp/bad-request (pr-str (:error coerced))))
-                  (assoc-in context path coerced))))}))
+  {:enter (fn [context]
+            (let [path [:request :body-params]
+                  body (get-in context path)]
+              (println body)
+              (m/coerce schema body mt/json-transformer
+                        (fn [value] (assoc-in context path value))
+                        (fn [error] (->> error
+                                         :explain
+                                         me/humanize
+                                         pr-str
+                                         ring-resp/bad-request
+                                         (assoc context :response))))))})
+              ;;   (assoc context :response (ring-resp/bad-request (pr-str (:error coerced))))
 
 ;; Defines "/" and "/about" routes with their associated :get handlers.
 ;; The interceptors defined after the verb map (e.g., {:get home-page}
@@ -36,7 +42,7 @@
 
 ;; Tabular routes
 (def routes
-  #{["/test" :post (interceptors (verify-body s/Int) `echo)]})
+  #{["/test" :post (interceptors (verify-body :int) `echo)]})
 
 ;; Map-based routes
 ;(def routes `{"/" {:interceptors [(body-params/body-params) http/html-body]
