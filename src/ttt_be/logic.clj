@@ -41,4 +41,14 @@
    :id (random-uuid)
    :token (random-uuid)})
 
-;;  functions for manipulating state  are state -> {:state, :fx}
+;;  functions for manipulating state  are state -> map containing :state, optional :error and :fx keys
+;;  should it force players to have different names?
+(defn add-player [state name]
+  (let [player (create-player name)
+        state (update state :players assoc (:id player) player)]
+    {:state state}))
+
+(defn remove-player [state id]
+  {:state (-> state
+              (update :players dissoc id)
+              (update :waiting dissoc id))})

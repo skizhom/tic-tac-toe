@@ -13,4 +13,10 @@
   (is (not= (-> "test" create-player :id)
             (-> "test" create-player :id)))
   (is (not= (-> "test" create-player :token)
-            (-> "test" create-player :token))))
+            (-> "test" create-player :token)))
+  (let [state' (:state (add-player initial-state "test"))
+        player-id (-> state' :players ffirst)
+        state'' (:state (remove-player state' player-id))]
+    (is (m/validate State state'))
+    (is (m/validate State state''))
+    (is (= initial-state state''))))
