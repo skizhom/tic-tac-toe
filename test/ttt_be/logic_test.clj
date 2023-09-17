@@ -20,3 +20,10 @@
     (is (m/validate State state'))
     (is (m/validate State state''))
     (is (= initial-state state''))))
+
+(deftest auth-test
+  (is (nil? (confirm-player {:players {:a {:token :b}}} :a :other)))
+  (is (nil? (confirm-player {:players {:a {:token :b}}} :other :b)))
+  (is (nil? (confirm-player {:players {:a {:token :b}}} :other :other)))
+  (is (= {:token :b, :name "c", :id :a}
+         (confirm-player {:players {:a {:token :b :name "c" :id :a}}} :a :b))))

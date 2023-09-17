@@ -52,3 +52,9 @@
   {:state (-> state
               (update :players dissoc id)
               (update :waiting dissoc id))})
+
+(defn confirm-player [state id token]
+  (when-let [player (get (:players state) id)]
+    (when (= (:token player) token)
+      player)))
+
