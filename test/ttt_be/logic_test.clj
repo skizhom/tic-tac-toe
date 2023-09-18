@@ -20,8 +20,8 @@
         state' (add-player initial-state player)
         state'' (remove-player state' (:id player))]
     (testing "name collision detection test"
-      (is (not (player-name-already-exists? state' "else"))))
-    (is (player-name-already-exists? state' "test"))
+      (is (not (player-name-already-exists? state' "else")))
+      (is (player-name-already-exists? state' "test")))
     (is (m/validate State state'))
     (is (m/validate State state''))
     (is (= initial-state state''))))
