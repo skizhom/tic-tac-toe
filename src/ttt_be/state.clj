@@ -7,16 +7,13 @@
 
 (def state (atom initial-state))
 
-;; (defn state-swap! [f & args]
-;;   (swap! state (fn [old]
-;;                  (apply f (:state old) args))))
-
-(defn get! [] (:state @state))
-
 (def state-interceptor
   {:name ::state-interceptor
    :enter (fn [context]
-            (assoc context :state (get!)))
+            (assoc-in context [:request :state] @state))
    :leave (fn [context]
-            (reset! state (-> context :state))
-            context)})
+            (if-let [[op & args] (:tx-data context)]
+              (do
+                (apply swap! state op args)
+                (assoc-in context [:request :database] @state))
+              context))})

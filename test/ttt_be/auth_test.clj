@@ -11,8 +11,9 @@
 (def state {:players {id-1 player-1}})
 
 (defn make-context [state id token]
-  {:state state :headers {"Player-Id" (str id)
-                          "Player-Token" (str token)}})
+  {:request {:state state}
+   :headers {"Player-Id" (str id)
+             "Player-Token" (str token)}})
 
 (deftest verify-player-test
   (is (= 401 (->> {:state :state :headers {}}
@@ -41,20 +42,20 @@
               :player))))
 
 (deftest register-player-test
-  (is (= 400 (->> {:state state :request {:body-params {:name "1"}}}
+  (is (= 400 (->> {:request {:state state :body-params {:name "1"}}}
                   sut/register-player
                   :response
                   :status)))
-  (is (= 200 (->> {:state state :request {:body-params {:name "test"}}}
+  (is (= 200 (->> {:request {:state state :body-params {:name "test"}}}
                   sut/register-player
                   :response
                   :status)))
-  (is (= 2 (->> {:state state :request {:body-params {:name "test"}}}
-                sut/register-player
-                :state
-                :players
-                count)))
-  (is (= "test" (->> {:state state :request {:body-params {:name "test"}}}
+  (is (= "test" (->> {:request {:state state :body-params {:name "test"}}}
+                     sut/register-player
+                     :tx-data
+                     second
+                     :name)))
+  (is (= "test" (->> {:request {:state state :body-params {:name "test"}}}
                      sut/register-player
                      :response
                      :body
