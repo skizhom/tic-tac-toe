@@ -53,4 +53,9 @@
                 sut/register-player
                 :state
                 :players
-                count))))
+                count)))
+  (is (= "test" (->> {:state state :body-params {:name "test"}}
+                     sut/register-player
+                     :response
+                     :body
+                     :name))))

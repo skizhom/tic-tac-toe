@@ -16,7 +16,7 @@
           state' (logic/add-player state player)]
     (assoc context
            :state state'
-           :response {:status 200 :body "player added"})))
+           :response {:status 200 :body player})))
 
 (defn verify-player [context]
   (b/cond
@@ -31,7 +31,9 @@
     auth (assoc context :player auth)))
 
 (def verify-player-interceptor
-  {:enter verify-player})
+  {:name ::verify-player
+   :enter verify-player})
 
 (def register-player-interceptor
-  {:enter register-player})
+  {:name :register-player
+   :enter register-player})
