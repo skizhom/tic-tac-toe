@@ -10,24 +10,25 @@
     :let [state (:state context)
           name (-> context :body-params :name)]
     (logic/player-name-already-exists? state name)
-    (assoc context :response
-           {:status 400 :body "duplicate player name"})
+    (assoc context :response (ring-resp/bad-request "duplicate player name"))
     :let [player (logic/create-player name)
           state' (logic/add-player state player)]
     (assoc context
            :state state'
-           :response {:status 200 :body player})))
+           :response (ring-resp/response player))))
+
+(defn unauthorized [b] {:status 401 :headers {} :body b})
 
 (defn verify-player [context]
   (b/cond
     :let [id (-> context :headers (get "Player-Id") str parse-uuid)
           token (-> context :headers (get "Player-Token") str parse-uuid)]
     (not (and id token)) (assoc context :response
-                                {:status 401 :body "needs player auth headers"})
+                                (unauthorized "needs player auth headers"))
     :let [state (:state context)
           auth (logic/verify-player-data state id token)]
     (nil? auth) (assoc context :response
-                       {:status 403 :body "invalid id/token"})
+                       (unauthorized "invalid id/token"))
     auth (assoc context :player auth)))
 
 (def verify-player-interceptor

@@ -27,11 +27,11 @@
                   sut/verify-player
                   :response
                   :status)))
-  (is (= 403 (->> (make-context state id-1 token-2)
+  (is (= 401 (->> (make-context state id-1 token-2)
                   sut/verify-player
                   :response
                   :status)))
-  (is (= 403 (->> (make-context state id-2 token-1)
+  (is (= 401 (->> (make-context state id-2 token-1)
                   sut/verify-player
                   :response
                   :status)))
