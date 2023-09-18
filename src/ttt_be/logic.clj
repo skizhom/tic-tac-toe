@@ -26,14 +26,18 @@
    ;; players by uuid
    [:players [:map-of :uuid Player]]
    ;;
-   [:waiting [:map-of :uuid [:map
-                             [:connection any?]
-                             [:time inst?]]]]
+   [:waiting
+    [:map-of :uuid [:map
+                    [:connection any?]]]]
+   [:watching-queue
+    [:map-of :uuid [:map
+                    [:connection any?]]]]
    ;; games by their uuid
    [:games [:map-of :uuid any?]]])
 
 (def initial-state {:players {}
                     :waiting {}
+                    :watching-queue {}
                     :games {}})
 
 (defn create-player [name]
@@ -41,20 +45,25 @@
    :id (random-uuid)
    :token (random-uuid)})
 
-;;  functions for manipulating state  are state -> map containing :state, optional :error and :fx keys
-;;  should it force players to have different names?
-(defn add-player [state name]
-  (let [player (create-player name)
-        state (update state :players assoc (:id player) player)]
-    {:state state}))
+(defn add-player [state player]
+  (let [state (update state :players assoc (:id player) player)]
+    state))
+
+(defn player-name-already-exists? [state name]
+  (let [matching (->> state
+                      :players
+                      vals
+                      (filter #(= name (:name %))))]
+    (pos? (count matching))))
 
 (defn remove-player [state id]
-  {:state (-> state
-              (update :players dissoc id)
-              (update :waiting dissoc id))})
+  (-> state
+      (update :players dissoc id)
+      (update :waiting dissoc id)))
 
-(defn confirm-player [state id token]
+(defn verify-player-data [state id token]
   (when-let [player (get (:players state) id)]
     (when (= (:token player) token)
       player)))
 
+;; there are three kinds of SSE 1. watch queue 2. subscribe 3. play game
