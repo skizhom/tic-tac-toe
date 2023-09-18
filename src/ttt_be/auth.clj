@@ -3,8 +3,6 @@
             [ring.util.response :as ring-resp]
             [better-cond.core :as b]))
 
-(def RegisterPlayer [:map [:name :string]])
-
 (defn register-player [context]
   (b/cond
     :let [state (:state context)
