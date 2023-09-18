@@ -1,6 +1,8 @@
 (ns ttt-be.service-test
   (:require [clojure.test :refer :all]
             [io.pedestal.test :refer :all]
+            [cheshire.core :as json]
+            [clojure.edn :as edn]
             [ttt-be.state :as s]
             [io.pedestal.http :as bootstrap]
             [ttt-be.service :as service]))
@@ -19,4 +21,11 @@
                 :body (pr-str body)))
 
 (deftest register-player-test
-  (is (= 200 (:status (response-edn service :post "/register-player" {:name "test1"})))))
+  (let [resp1 (response-edn service :post "/register-player" {:name "test1"})
+        body (-> (response-edn service :post "/register-player" {:name "test1"})
+                 :body
+                 edn/read-string)]
+    (is (= 200 (:status resp1)))
+    (is (= "test1" (:name body)))
+    (is (uuid? (:id body)))
+    (is (uuid? (:token body)))))

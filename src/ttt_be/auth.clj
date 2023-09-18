@@ -6,11 +6,12 @@
 (defn register-player [context]
   (b/cond
     :let [state (:state context)
-          name (-> context :body-params :name)]
+          name (-> context :request :body-params :name)]
     (logic/player-name-already-exists? state name)
     (assoc context :response (ring-resp/bad-request "duplicate player name"))
     :let [player (logic/create-player name)
           state' (logic/add-player state player)]
+    :do (print player (:state context) name)
     (assoc context
            :state state'
            :response (ring-resp/response player))))

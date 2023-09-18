@@ -41,20 +41,20 @@
               :player))))
 
 (deftest register-player-test
-  (is (= 400 (->> {:state state :body-params {:name "1"}}
+  (is (= 400 (->> {:state state :request {:body-params {:name "1"}}}
                   sut/register-player
                   :response
                   :status)))
-  (is (= 200 (->> {:state state :body-params {:name "test"}}
+  (is (= 200 (->> {:state state :request {:body-params {:name "test"}}}
                   sut/register-player
                   :response
                   :status)))
-  (is (= 2 (->> {:state state :body-params {:name "test"}}
+  (is (= 2 (->> {:state state :request {:body-params {:name "test"}}}
                 sut/register-player
                 :state
                 :players
                 count)))
-  (is (= "test" (->> {:state state :body-params {:name "test"}}
+  (is (= "test" (->> {:state state :request {:body-params {:name "test"}}}
                      sut/register-player
                      :response
                      :body
