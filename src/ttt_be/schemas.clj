@@ -36,4 +36,4 @@
    [:games [:map-of :uuid any?]]])
 
 ;; for requests
-(def RegisterPlayer [:map [:name]])
+(def RegisterPlayer [:map [:name PlayerName]])

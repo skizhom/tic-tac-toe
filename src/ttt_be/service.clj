@@ -8,7 +8,7 @@
             [malli.core :as m]
             [malli.transform :as mt]
             [malli.error :as me]
-            [ttt-be.auth :as auth]
+            [ttt-be.schemas :as schemas]
             [ttt-be.state :as state]
             ;; [io.pedestal.http.ring-middlewares :as middleware]
             [ring.util.response :as ring-resp]))
@@ -47,7 +47,7 @@
 ;; Tabular routes
 (def routes
   #{["/register-player" :post
-     (interceptors (verify-body auth/RegisterPlayer)
+     (interceptors (verify-body schemas/RegisterPlayer)
                    auth/register-player-interceptor)]})
 
 ;; Map-based routes
