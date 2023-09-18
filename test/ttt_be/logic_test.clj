@@ -2,6 +2,7 @@
   (:require [ttt-be.logic :refer :all]
             [clojure.test :refer [is are testing deftest]]
             [better-cond.core :as b]
+            [ttt-be.state :refer [initial-state State Player]]
             [malli.core :as m]))
 
 (deftest initial-state-test
