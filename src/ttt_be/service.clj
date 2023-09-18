@@ -8,6 +8,8 @@
             [malli.core :as m]
             [malli.transform :as mt]
             [malli.error :as me]
+            [ttt-be.auth :as auth]
+            [ttt-be.state :as state]
             ;; [io.pedestal.http.ring-middlewares :as middleware]
             [ring.util.response :as ring-resp]))
 
@@ -19,30 +21,34 @@
   (ring-resp/response (pr-str request)))
 
 (defn verify-body [schema]
-  {:enter (fn [context]
+  {:name ::verify-body
+   :enter (fn [context]
             (let [path [:request :body-params]
                   body (get-in context path)]
               (println body)
               (m/coerce schema body mt/json-transformer
                         (fn [value] (assoc-in context path value))
-                        (fn [error] (->> error
-                                         :explain
-                                         me/humanize
-                                         pr-str
-                                         ring-resp/bad-request
-                                         (assoc context :response))))))})
-              ;;   (assoc context :response (ring-resp/bad-request (pr-str (:error coerced))))
+                        (fn [error]
+                          (println error)
+                          (->> error
+                               :explain
+                               me/humanize
+                               pr-str
+                               ring-resp/bad-request
+                               (assoc context :response))))))})
 
 ;; Defines "/" and "/about" routes with their associated :get handlers.
 ;; The interceptors defined after the verb map (e.g., {:get home-page}
 ;; apply to / and its children (/about).
-(def common-interceptors [(body-params/body-params) unify-body-params])
+(def common-interceptors  [(body-params/body-params) unify-body-params state/state-interceptor])
 
 (defn interceptors [& specific] (vec (concat common-interceptors specific)))
 
 ;; Tabular routes
 (def routes
-  #{["/test" :post (interceptors (verify-body :int) `echo)]})
+  #{["/register-player" :post
+     (interceptors (verify-body auth/RegisterPlayer)
+                   auth/register-player-interceptor)]})
 
 ;; Map-based routes
 ;(def routes `{"/" {:interceptors [(body-params/body-params) http/html-body]
