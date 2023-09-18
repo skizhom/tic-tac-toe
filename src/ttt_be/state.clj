@@ -47,7 +47,9 @@
 (defn get! [] (:state @state))
 
 (def state-interceptor
-  {:enter (fn [context]
+  {:name ::state-interceptor
+   :enter (fn [context]
             (assoc context :state (get!)))
    :leave (fn [context]
-            (reset! state (-> context :state)))})
+            (reset! state (-> context :state))
+            context)})
