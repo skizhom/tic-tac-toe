@@ -1,5 +1,5 @@
-(ns ttt-be.logic-test
-  (:require [ttt-be.logic :refer :all]
+(ns ttt-be.state-helpers-test
+  (:require [ttt-be.state-helpers :refer :all]
             [clojure.test :refer [is are testing deftest]]
             [better-cond.core :as b]
             [ttt-be.schemas :refer [State Player]]

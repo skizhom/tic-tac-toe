@@ -1,4 +1,4 @@
-(ns ttt-be.logic
+(ns ttt-be.state-helpers
   (:require [better-cond.core :as b]))
 
 (defn create-player [name]
