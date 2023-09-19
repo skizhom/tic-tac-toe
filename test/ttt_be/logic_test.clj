@@ -4,7 +4,8 @@
             [better-cond.core :as b]
             [ttt-be.schemas :refer [State Player]]
             [ttt-be.state :refer [initial-state]]
-            [malli.core :as m]))
+            [malli.core :as m]
+            [ttt-be.state :as s]))
 
 (deftest initial-state-test
   (is (m/validate State initial-state)))
@@ -32,3 +33,9 @@
   (is (nil? (verify-player-data {:players {:a {:token :b}}} :other :other)))
   (is (= {:token :b, :name "c", :id :a}
          (verify-player-data {:players {:a {:token :b :name "c" :id :a}}} :a :b))))
+
+(deftest queue-manipulation-test
+  (is (= {:id1 {:connection :conn-thing}} (:waiting (add-player-to-waiting-list initial-state :id1 :conn-thing))))
+  (is (= {} (-> initial-state (add-player-to-waiting-list :id1 :conn-thing)
+                (remove-player-from-waiting-list :id1)
+                :waiting))))

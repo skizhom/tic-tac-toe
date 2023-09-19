@@ -27,4 +27,8 @@
     (when (= (:token player) token)
       player)))
 
-;; there are three kinds of SSE 1. watch queue 2. subscribe 3. play game
+(defn add-player-to-waiting-list [state uuid send-fn]
+  (update state :waiting assoc uuid {:connection send-fn}))
+
+(defn remove-player-from-waiting-list [state uuid]
+  (update state :waiting dissoc uuid))
