@@ -19,3 +19,7 @@ CHANGELOG.md
 LICENSE
 README.md
 tic-tac-toe.iml
+.calva/
+.clj-kondo/
+.lsp/
+.cpcache
